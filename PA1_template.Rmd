@@ -79,8 +79,8 @@ median_TotalStepsPerDay <- median(TotalStepsPerDay, na.rm = TRUE)
 mean_TotalStepsPerDay   <- toString(round(mean_TotalStepsPerDay, digits = 2)) 
 ```
 
-The mean of the total number of steps taken per day **`r mean_TotalStepsPerDay`**  
-The median of the total number of steps taken per day **`r median_TotalStepsPerDay`**
+The mean of the total number of steps taken per day is **`r mean_TotalStepsPerDay`**  
+The median of the total number of steps taken per day is **`r median_TotalStepsPerDay`**
 
 ## What is the average daily activity pattern?
 
@@ -114,18 +114,97 @@ MaxAvgSteps[1,2] <- toString(round(MaxAvgSteps[1,2], digits = 2))
 
 ## Imputing missing values
 
+1. Calculate and report the total number of missing values in the dataset 
 
+```{r}
+NumberOfMissingValues <- sum(is.na(data$steps))
+```
 
+Number of Missing Values in the dataset is **`r NumberOfMissingValues`**.
 
+2. Devise a strategy for filling in all of the missing values in the dataset.
 
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
+```{r}
+MergedData <- merge(data, AvgStepsByInterval, by = "interval")
+MergedData$RoundAvgSteps <- as.integer(round(MergedData$AvgSteps, digits = 0))
+isNA <- is.na(MergedData$steps)
+MergedData[isNA,2] <- MergedData[isNA,5]
+MergedData <- MergedData[, 1:3]
+```
 
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+```{r}
+TotalStepsPerDay2 <- tapply(MergedData$steps, MergedData$date, sum)
+hist(TotalStepsPerDay2, breaks=5, xlab="Steps", main = "Total Steps per Day with NAs Fixed", col="red")
+hist(TotalStepsPerDay, breaks=5, xlab="Steps", main = "Total Steps per Day with NAs Fixed", col="blue", add = T )
+legend("topright", c("Imputed Data", "Original Data"), fill=c("red", "blue") )
+
+```
+
+```{r}
+mean_TotalStepsPerDay2   <- mean(TotalStepsPerDay2)
+median_TotalStepsPerDay2 <- median(TotalStepsPerDay2)
+```
+
+```{r, echo = FALSE}
+mean_TotalStepsPerDay2   <- toString(round(mean_TotalStepsPerDay2, digits = 2)) 
+```
+
+The means are  **`r mean_TotalStepsPerDay`** and **`r mean_TotalStepsPerDay2`**  
+The medians are **`r median_TotalStepsPerDay`** and **`r median_TotalStepsPerDay2`**  
+It seems both medians and means are slightly different between the original and imputed data.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+```{r}
+MergedData$DayTypeFactor <- ifelse(weekdays(as.Date(MergedData$date)) %in% c("Saturday", "Sunday"), "Weekend", "Weekday")
+```
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+```{r}
+MergedDataWeekDay <- MergedData[MergedData$DayTypeFactor == "Weekday",][,1:3]
+MergedDataWeekEnd <- MergedData[MergedData$DayTypeFactor == "Weekend",][,1:3]
 
 
 
+AvgStepsByInterval_MergedDataWeekDay <- setNames(aggregate(steps ~ interval, MergedDataWeekDay, mean), c("interval", "AvgSteps"))
+AvgStepsByInterval_MergedDataWeekEnd <- setNames(aggregate(steps ~ interval, MergedDataWeekEnd, mean), c("interval", "AvgSteps"))
+
+#m <- matrix(c(1,1,2,2),2, 2, byrow = TRUE)
+#layout(m, heights = c(50,50))
+
+par(mfrow = c(2,1), mar = c(2,5,5,0))
+with(AvgStepsByInterval_MergedDataWeekDay, plot(interval, 
+                                                AvgSteps, 
+                                                main = "WeekDays",
+                                                xlab = "",
+                                                ylab = "Steps",
+                                                col = "red",
+                                                type = "l",
+                                                panel.first = grid()
+                                                ))
+
+with(AvgStepsByInterval_MergedDataWeekEnd, plot(interval, 
+                                                AvgSteps, 
+                                                main = "Weekends",
+                                                col = "blue",
+                                                xlab = "Intervals",
+                                                ylab = "Steps",
+                                                type = "l",
+                                                panel.first = grid()
+                                                ))
+
+
+
+
+
+```
 
 
 
