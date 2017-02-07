@@ -124,6 +124,8 @@ Number of Missing Values in the dataset is **`r NumberOfMissingValues`**.
 
 2. Devise a strategy for filling in all of the missing values in the dataset.
 
+My strategy will be fillinng missing values out with the average steps per intervals.
+
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
 ```{r}
@@ -171,13 +173,8 @@ MergedData$DayTypeFactor <- ifelse(weekdays(as.Date(MergedData$date)) %in% c("Sa
 MergedDataWeekDay <- MergedData[MergedData$DayTypeFactor == "Weekday",][,1:3]
 MergedDataWeekEnd <- MergedData[MergedData$DayTypeFactor == "Weekend",][,1:3]
 
-
-
 AvgStepsByInterval_MergedDataWeekDay <- setNames(aggregate(steps ~ interval, MergedDataWeekDay, mean), c("interval", "AvgSteps"))
 AvgStepsByInterval_MergedDataWeekEnd <- setNames(aggregate(steps ~ interval, MergedDataWeekEnd, mean), c("interval", "AvgSteps"))
-
-#m <- matrix(c(1,1,2,2),2, 2, byrow = TRUE)
-#layout(m, heights = c(50,50))
 
 par(mfrow = c(2,1), mar = c(2,5,5,0))
 with(AvgStepsByInterval_MergedDataWeekDay, plot(interval, 
@@ -199,9 +196,6 @@ with(AvgStepsByInterval_MergedDataWeekEnd, plot(interval,
                                                 type = "l",
                                                 panel.first = grid()
                                                 ))
-
-
-
 
 
 ```
