@@ -214,8 +214,11 @@ with(AvgStepsByInterval, plot(interval,
 <pre class="r"><code>NumberOfMissingValues &lt;- sum(is.na(data$steps))</code></pre>
 <p>Number of Missing Values in the dataset is <strong>2304</strong>.</p>
 <ol start="2" style="list-style-type: decimal">
-<li><p>Devise a strategy for filling in all of the missing values in the dataset.</p></li>
-<li><p>Create a new dataset that is equal to the original dataset but with the missing data filled in.</p></li>
+<li>Devise a strategy for filling in all of the missing values in the dataset.</li>
+</ol>
+<p>My strategy will be fillinng missing values out with the average steps per intervals.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Create a new dataset that is equal to the original dataset but with the missing data filled in.</li>
 </ol>
 <pre class="r"><code>MergedData &lt;- merge(data, AvgStepsByInterval, by = &quot;interval&quot;)
 MergedData$RoundAvgSteps &lt;- as.integer(round(MergedData$AvgSteps, digits = 0))
